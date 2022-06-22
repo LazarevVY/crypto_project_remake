@@ -160,57 +160,59 @@ print (response.statusCode);
         if (snapshot.hasData) {
           return Container(
             height: widget.height == 0.0 ? MediaQuery.of(context).size.height : widget.height,
-            child: Card(
-              child: ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  var datetime = DateTime.fromMillisecondsSinceEpoch(
-                      snapshot.data![index].publishedOn * 1000);
-                  var fmt = DateFormat( "dd/MM/yyyy" );
-                  var dateString = fmt.format(datetime);
-                  return GestureDetector(
+            child: ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                var datetime = DateTime.fromMillisecondsSinceEpoch ( snapshot.data![index].publishedOn * 1000 );
+                var fmt = DateFormat( "dd.MM.yyyy" );
+                var dateString = fmt.format(datetime);
+                return Card(
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  child: GestureDetector(
                     child: Padding(
-                      padding: const EdgeInsets.only( top: 20.0, left: 20.0, right: 20.0 ),
+                      padding: const EdgeInsets.only( top: 15.0, left: 10.0, right: 10.0, bottom: 15.0),
                       child: Column(
                         children: <Widget>[
-                          Text( snapshot.data![ index ].title,
-                            style: AppSettings.newsListItemTitle,
-                            textAlign: TextAlign.start,),
+                          Row(//News source image, title
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: snapshot.data![ index ].sourceInfo.img,
+                                imageBuilder: (context, imageProvider) => Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage( //image size fill
+                                      image: imageProvider,
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                  ),
+                                ),
+                                placeholder: (context, url) => Container(
+                                  alignment: Alignment.center,
+                                  child: CircularProgressIndicator(), // you can add pre loader iamge as well to show loading.
+                                ), //show progress  while loading image
+                                errorWidget: (context, url, error) => Icon(Icons.error), //Image.asset("assets/noimage.jpg"),
+                                //show no image available image on error loading
+                              ),
+                              SizedBox(width: 10,),
+                              Flexible(//Обеспечивает перенос текста
+                                child: Text( snapshot.data![ index ].title,
+                                  style: AppSettings.newsListItemTitle,
+                                  textAlign: TextAlign.start,),
+                              ),
+                            ],
+                          ),
                           const SizedBox( height: 10.0, ),
                           Row( // News date, sourceInfo img and name
                             children: <Widget>[
                               Text( dateString,
                                 style: AppSettings.newsListItemDate,),
-                              Padding(
-                                padding: const EdgeInsets.only( left: 10.0, right: 5.0 ),
-                                child: Container( width: 20.0, height: 20.0,
-                                  //child: Image.network( snapshot.data![ index ].sourceInfo.img ),
-                                  child: CachedNetworkImage(
-                                    imageUrl: snapshot.data![ index ].sourceInfo.img,
-                                    imageBuilder: (context, imageProvider) => Container(
-                                      //width: 400,
-                                      //height: 200,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage( //image size fill
-                                          image: imageProvider,
-                                          fit: BoxFit.fitWidth,
-                                        ),
-                                      ),
-                                    ),
-                                    placeholder: (context, url) => Container(
-                                      alignment: Alignment.center,
-                                      child: CircularProgressIndicator(), // you can add pre loader iamge as well to show loading.
-                                    ), //show progress  while loading image
-                                    errorWidget: (context, url, error) => Icon(Icons.error), //Image.asset("assets/noimage.jpg"),
-                                    //show no image available image on error loading
-                                  ),
-                                ),
-                              ),
+                              SizedBox(width: 20,),
                               Text( snapshot.data![ index ].sourceInfo.name,
                                 style: AppSettings.newsListItemSourceInfoName,),
                             ],
                           ),
-                          const Divider( height: 10.0, color: Colors.black87, ),
                         ],
                       ),
                     ),
@@ -245,9 +247,9 @@ print (response.statusCode);
                                           ),
                                           placeholder: (context, url) => Container(
                                             alignment: Alignment.center,
-                                            child: CircularProgressIndicator(), // you can add pre loader iamge as well to show loading.
+                                            child: const CircularProgressIndicator(), // you can add pre loader iamge as well to show loading.
                                           ), //show progress  while loading image
-                                          errorWidget: (context, url, error) => Icon(Icons.error), //Image.asset("assets/noimage.jpg"),
+                                          errorWidget: (context, url, error) => const Icon ( Icons.error ), //Image.asset("assets/noimage.jpg"),
                                           //show no image available image on error loading
                                         ),
                                         fit: BoxFit.fill,),),),
@@ -296,9 +298,9 @@ print (response.statusCode);
                         },
                       );
                     },
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           );
         } else if(snapshot.hasError) {
